@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from glob import glob
 from tqdm import tqdm
 
@@ -19,6 +20,9 @@ def main():
         os.makedirs(png_dir_path, exist_ok=True)
 
         convert_pdf_to_png(form_pdf_path, png_dir_path)
+    
+    ## 02. Data Model Generation
+    
 
 
 
