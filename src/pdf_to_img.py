@@ -9,7 +9,12 @@ def convert_pdf_to_png(pdf_path, output_folder):
         page = pdf_document.load_page(page_number)
         pixmap = page.get_pixmap(dpi=600)
 
-        output_file = f"{output_folder}/{file_name}_{page_number + 1}.png"
+        if len(str(page_number+1)) == 1:
+            prefixed_page_no = "00"+str(page_number+1)
+        elif len(str(page_number+1)) == 2:
+            prefixed_page_no = "0"+str(page_number+1)
+
+        output_file = f"{output_folder}/{file_name}_{prefixed_page_no}.png"
         pixmap.save(output_file)
         # print(f"Saved: {output_file}")
     

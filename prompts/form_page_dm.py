@@ -20,10 +20,15 @@ def prompt_for_page_dm(png_path):
     ## Check for existing previous png proto template
     proto_dir_path = os.path.join(forms_proto_dm_dir_path, "forms_proto_dm", os.path.basename(os.path.dirname(png_path)))
     png_name = os.path.basename(png_path)
-    page_no= int(re.search(r'_(\d+)\.png$', png_name).group(1))
+    page_no= str(re.search(r'_(\d+)\.png$', png_name).group(1))
 
-    if page_no!=1:
-        prev_page_no = str(page_no-1)
+    if page_no!="001":
+        prev_page_no = str(int(page_no)-1)
+        if len(prev_page_no) == 1:
+            prev_page_no = "00"+prev_page_no
+        elif len(prev_page_no) == 2:
+            prev_page_no = "0"+prev_page_no
+
         possible_previous_proto_name = re.sub(r'(\d+)(?=\.png$)', prev_page_no, png_name)[:-4]+".proto"
         possible_previous_proto_path = os.path.join(proto_dir_path, possible_previous_proto_name)
 

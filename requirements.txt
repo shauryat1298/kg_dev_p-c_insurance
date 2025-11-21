@@ -1,2 +1,6 @@
 PyMuPDF
 tqdm
+asyncio
+python-dotenv
+xai-sdk
+openai
