@@ -18,7 +18,7 @@ def prompt_for_page_dm(png_path):
     """
 
     ## Check for existing previous png proto template
-    proto_dir_path = os.path.join(forms_proto_dm_dir_path, "forms_proto_dm", os.path.basename(os.path.dirname(png_path)))
+    proto_dir_path = os.path.join(forms_proto_dm_dir_path, os.path.basename(os.path.dirname(png_path)))
     png_name = os.path.basename(png_path)
     page_no= str(re.search(r'_(\d+)\.png$', png_name).group(1))
 
@@ -46,21 +46,21 @@ def prompt_for_page_dm(png_path):
 
     text_prompt += "\n\nOnly return a proto3 syntax file. DON'T RETURN ANY EXPLANATIONS."
 
-    inference_message = encode_image(png_path)
+    base64_img = encode_image(png_path)
     inf_img_media_type = "image/png"
 
 
     messages = [{"role": "user","content": 
                 [
                     {
-                    "type": "image_base64",
-                    "image_base64": {
-                        "base64": f"data:image/png;base64,{inference_message}"
-                    }
-                    },
-                    {
                     "type": "text",
                     "text": text_prompt
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/png;base64,{base64_img}"
+                        }
                     }
                 ]
                 }]
