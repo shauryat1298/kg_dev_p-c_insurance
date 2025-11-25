@@ -11,10 +11,28 @@ from config import BASE_PATH, ARTIFACTS_PATH, forms_proto_dm_dir_path
 def prompt_for_page_dm(png_path):
 
     text_prompt = f"""
-    You will be provided the image of pdf application form.
-    Does this image has any questions to be answered by user. Think of it as a True or False.
-    If False, stop here and return an empty string.
-    If True, Develop a proto data model (include all questions, ignore if they are answered or not). For every row, very briefly mention the question as a comment.
+    You will be given an image of a PDF application form.
+
+    1. First, determine whether the image contains any questions that require user responses. 
+    - A question counts if it requests input (text fields, checkboxes, yes/no, blanks, multi-row tables, etc.).
+    - If there are no questions, return an empty string ("") and stop.
+    - If questions exist, continue.
+
+    2. If questions are present, generate a complete Proto3-style data model that includes EVERY QUESTION in the form.
+    - Include the question even if an answer is already filled in.
+    - Organize the proto into multiple message objects based on semantic meaning.
+    - Group related questions into the same message (e.g., ApplicantInformation, BusinessInformation, CoverageDetails, PropertyDetails, LossHistory, etc.).
+    - Create additional message objects whenever needed to maintain logical grouping.
+    - Use nested messages for subsections.
+    - Use snake_case for field names.
+    - For each field, add a brief comment summarizing the question.
+    - Use appropriate Proto3 types (string, bool, int32, double, repeated).
+
+    3. Output format:
+    A. First line: "" (if no questions)
+    B. If true, output the full Proto3 data model.
+
+
     """
 
     ## Check for existing previous png proto template

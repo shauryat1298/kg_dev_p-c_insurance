@@ -1,5 +1,10 @@
 import re
+import os
 import base64
+
+from openai import OpenAI
+
+from config import OPENROUTER_MODEL_NAME, extra_body
 
 def encode_image(image_path):
   with open(image_path, "rb") as image_file:
@@ -19,3 +24,16 @@ def extract_proto_code_for_llm_response(text: str) -> str:
         return text[start_idx:].strip().replace("```","")
 
     return ""
+
+def call_openrouter_llm(messages):
+    client = OpenAI(
+        base_url="https://openrouter.ai/api/v1",
+        api_key=os.getenv("OPENROUTER_API_KEY"),
+    )
+    response = client.chat.completions.create(
+        model = OPENROUTER_MODEL_NAME,
+        messages = messages,
+        extra_body=extra_body
+    )
+
+    return response.choices[0].message.content
