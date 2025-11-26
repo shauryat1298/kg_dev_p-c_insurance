@@ -25,6 +25,18 @@ def extract_proto_code_for_llm_response(text: str) -> str:
 
     return ""
 
+def extract_proto_messages(proto_content):
+    messages = {}
+    pattern = r'message\s+(\w+)\s*\{([^}]*(?:\{[^}]*\}[^}]*)*)\}'
+    matches = re.finditer(pattern, proto_content, re.MULTILINE | re.DOTALL)
+    
+    for match in matches:
+        message_name = match.group(1)
+        message_body = match.group(2)
+        messages[message_name] = f"message {message_name} {{{message_body}}}"
+    
+    return messages
+
 def call_openrouter_llm(messages):
     client = OpenAI(
         base_url="https://openrouter.ai/api/v1",

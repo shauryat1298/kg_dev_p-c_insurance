@@ -30,8 +30,7 @@ def prompt_for_page_dm(png_path):
 
     3. Output format:
     A. First line: "" (if no questions)
-    B. If true, output the full Proto3 data model.
-
+    B. If there are questions, output the full Proto3 data model.
 
     """
 
@@ -65,8 +64,6 @@ def prompt_for_page_dm(png_path):
     text_prompt += "\n\nOnly return a proto3 syntax file. DON'T RETURN ANY EXPLANATIONS."
 
     base64_img = encode_image(png_path)
-    inf_img_media_type = "image/png"
-
 
     messages = [{"role": "user","content": 
                 [

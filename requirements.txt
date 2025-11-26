@@ -5,3 +5,4 @@ python-dotenv
 xai-sdk
 openai
 ipykernel
+chromadb
