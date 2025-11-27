@@ -7,8 +7,8 @@ from openai import OpenAI
 
 from chromadb import PersistentClient
 
-from src.utils import extract_proto_messages
-from config import BASE_PATH, ARTIFACTS_PATH, chroma_db_client_path, collection_name
+from src.utils import extract_proto_messages, generate_random_id
+from config import BASE_PATH, ARTIFACTS_PATH, chroma_db_client_path, collection_name, OPENROTUER_EMBEDDING_MODEL_NAME
 
 
 load_dotenv()
@@ -32,13 +32,23 @@ def embed_data_models(form_proto_dm_dir_path):
         proto_dict = extract_proto_messages(page_proto_dm)
         proto_list = [v for _, v in proto_dict.items()]
         embeddings = openai_client.embeddings.create(
-            model="sentence-transformers/all-minilm-l12-v2",
+            model=OPENROTUER_EMBEDDING_MODEL_NAME,
             input = proto_list, 
             encoding_format="float"
         )
 
         embedding_list = [e.embedding for e in embeddings.data]
-        
+        metadata_list = [{"sectional_headings": key, "page_proto_dm_path": page_proto_dm_path} for key in proto_dict.keys()]
+        ids = [f"{generate_random_id()}_{key}" for key in proto_dict.keys()]
+
+        collection.add(
+            documents=proto_list,        # list[str] - Make sure proto_list is defined
+            embeddings=embedding_list,   # list[list[float]]
+            ids=ids,                     # list[str]
+            metadatas=metadata_list
+        )
+
+
 
 
         
