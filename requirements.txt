@@ -3,6 +3,6 @@ tqdm
 asyncio
 python-dotenv
 xai-sdk
+chromadb
 openai
 ipykernel
-chromadb

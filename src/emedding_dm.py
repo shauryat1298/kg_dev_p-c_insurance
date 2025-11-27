@@ -29,6 +29,7 @@ def embed_data_models(form_proto_dm_dir_path):
         with open(page_proto_dm_path, "r") as f:
             page_proto_dm = f.read()
         
+        
         proto_dict = extract_proto_messages(page_proto_dm)
         proto_list = [v for _, v in proto_dict.items()]
         embeddings = openai_client.embeddings.create(

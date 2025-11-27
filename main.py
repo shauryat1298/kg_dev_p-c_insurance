@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from glob import glob
 from tqdm import tqdm
+import shutil
 
 from dotenv import load_dotenv
 
@@ -11,7 +12,7 @@ from src.page_data_model_dev import convert_png_dir_to_proto_dm
 from src.emedding_dm import embed_data_models
 
 ## Define paths
-from config import BASE_PATH, ARTIFACTS_PATH, forms_pdf_dir_path, forms_png_dir_path, forms_proto_dm_dir_path
+from config import BASE_PATH, ARTIFACTS_PATH, forms_pdf_dir_path, forms_png_dir_path, forms_proto_dm_dir_path, chroma_db_client_path
 
 def main():
 
@@ -60,7 +61,6 @@ def main():
 
         form_pdf_name = os.path.basename(form_proto_dm_dir_path)
         print(f"✓ Proto Data Model Embedded: {form_pdf_name}")
-        break
 
     print("Step 3 Completed.\n")
 
