@@ -6,3 +6,4 @@ xai-sdk
 chromadb
 openai
 ipykernel
+scikit-learn

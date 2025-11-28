@@ -6,7 +6,7 @@ import string
 
 from openai import OpenAI
 
-from config import OPENROUTER_MODEL_NAME, extra_body
+from config import extra_body
 
 def encode_image(image_path):
   with open(image_path, "rb") as image_file:
@@ -36,13 +36,13 @@ def extract_proto_messages(proto_content):
     
     return messages
 
-def call_openrouter_llm(messages):
+def call_openrouter_llm(messages, model_name):
     client = OpenAI(
         base_url="https://openrouter.ai/api/v1",
         api_key=os.getenv("OPENROUTER_API_KEY"),
     )
     response = client.chat.completions.create(
-        model = OPENROUTER_MODEL_NAME,
+        model = model_name,
         messages = messages,
         extra_body=extra_body
     )
