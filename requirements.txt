@@ -1,6 +1,7 @@
 PyMuPDF
 tqdm
 asyncio
+aiofiles
 python-dotenv
 xai-sdk
 chromadb

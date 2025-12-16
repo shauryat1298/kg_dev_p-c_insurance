@@ -5,8 +5,9 @@ import random
 import string
 import json
 
-from openai import OpenAI
-
+import asyncio
+from openai import OpenAI, AsyncOpenAI, APIError, RateLimitError
+from dotenv import load_dotenv
 from config import extra_body, temperature
 
 def encode_image(image_path):
@@ -50,6 +51,35 @@ def call_openrouter_llm(messages, model_name):
     )
 
     return response.choices[0].message.content
+
+load_dotenv()
+async_client = AsyncOpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key=os.getenv("OPENROUTER_API_KEY"),
+)
+
+async def call_openrouter_llm_async(messages, model_name, max_retries=3):
+    for attempt in range(max_retries):
+        try:
+            response = await async_client.chat.completions.create(
+                model=model_name,
+                messages=messages,
+                temperature=temperature,
+                extra_body=extra_body
+            )
+            return response.choices[0].message.content
+        except RateLimitError:
+            if attempt < max_retries - 1:
+                wait_time = 2 ** attempt 
+                print(f"Rate limited. Waiting {wait_time}s before retry...")
+                await asyncio.sleep(wait_time)
+            else:
+                raise
+        except APIError as e:
+            print(f"API error on attempt {attempt + 1}: {e}")
+            if attempt == max_retries - 1:
+                raise
+            await asyncio.sleep(1)
 
 def call_openrouter_embeddings(texts, model_name):
     client = OpenAI(
