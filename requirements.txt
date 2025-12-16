@@ -7,3 +7,6 @@ chromadb
 openai
 ipykernel
 scikit-learn
+langchain-core
+langchain-openai
+langgraph

@@ -10,9 +10,11 @@ forms_proto_dm_dir_path = os.path.join(ARTIFACTS_PATH, "forms_proto_dm")
 
 chroma_db_client_path = os.path.join(ARTIFACTS_PATH, "chroma_db_client")
 collection_name = "construction_lob"
+master_collection_name = "kg_entity_construction"
 
 # Model Used in OpenRouter
 COMPLEX_MODEL_NAME = "anthropic/claude-sonnet-4.5"
 SIMPLE_MODEL_NAME = "openai/gpt-5-nano"
 OPENROUTER_EMBEDDING_MODEL_NAME = "sentence-transformers/all-minilm-l12-v2"
 extra_body = {}
+temperature = 0
