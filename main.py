@@ -19,6 +19,10 @@ from states.cluster_dev_state import ClusterDevState
 from config import BASE_PATH, ARTIFACTS_PATH, forms_pdf_dir_path, forms_png_dir_path, forms_proto_dm_dir_path, chroma_db_client_path, master_collection_name, collection_name
 
 client = PersistentClient(path=chroma_db_client_path)
+try:
+    client.delete_collection(master_collection_name)
+except: 
+    pass
 master_kg_entity_collection = client.get_or_create_collection(name=master_collection_name)
 sectional_collection = client.get_or_create_collection(name=collection_name)
 
@@ -84,8 +88,7 @@ def main():
     sections = list(zip(section_headings, section_descs, section_embeddings, section_proto_dm))
     random.shuffle(sections)
     section_headings, section_descs, section_embeddings, section_proto_dm = zip(*sections)
-
-    client.delete_collection(master_collection_name)
+    
     master_kg_entity_collection = client.get_or_create_collection(name=master_collection_name)
     graph = build_cluster_dev_graph_workflow()
 
@@ -111,7 +114,7 @@ def main():
         
         print("Master KG entities: ", master_kg_entity_collection.get()['ids'])
 
-    print("Step 3 Completed.\n")
+    print("Step 4 Completed.\n")
 
     print("===== ALL TASKS COMPLETED SUCCESSFULLY =====")
 

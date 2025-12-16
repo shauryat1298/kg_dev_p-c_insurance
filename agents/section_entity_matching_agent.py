@@ -1,4 +1,5 @@
 from chromadb import PersistentClient
+from chromadb.errors import NotFoundError
 import numpy as np
 from prompts.section_entity_matching_prompt import section_entity_matching_prompt
 
@@ -10,19 +11,35 @@ client = PersistentClient(path=chroma_db_client_path)
 master_kg_entity_collection = client.get_or_create_collection(name=master_collection_name)
 sectional_collection = client.get_or_create_collection(name=collection_name)
 
+
+def _get_master_collection():
+    """Fetch a fresh handle to the master KG collection to avoid stale UUIDs after deletion."""
+    return client.get_or_create_collection(name=master_collection_name)
+
+
 def section_entity_matching_agent(state: ClusterDevState):
+    master_collection = _get_master_collection()
     section_emb = state.get("section", {}).get("embedding")
     if section_emb is None or (isinstance(section_emb, (list, np.ndarray)) and len(section_emb) == 0):
         return {"section_entity_match_bool": False}
 
     # --- 1. Query top-1 entity safely ---
-    top_matched_entity_result = master_kg_entity_collection.query(
-        query_embeddings=[section_emb],
-        n_results=1,
-        include=["documents", "metadatas", "embeddings", "distances"]
-    )
+    try:
+        top_matched_entity_result = master_collection.query(
+            query_embeddings=[section_emb],
+            n_results=1,
+            include=["documents", "metadatas", "embeddings", "distances"]
+        )
+    except NotFoundError:
+        # If the collection was deleted/recreated elsewhere, refresh the handle and retry once.
+        master_collection = _get_master_collection()
+        top_matched_entity_result = master_collection.query(
+            query_embeddings=[section_emb],
+            n_results=1,
+            include=["documents", "metadatas", "embeddings", "distances"]
+        )
 
-    if not top_matched_entity_result["ids"][0]:
+    if not top_matched_entity_result.get("ids") or not top_matched_entity_result["ids"][0]:
         return {"section_entity_match_bool": False}
 
     # --- 2. Extract top match ---
