@@ -1,5 +1,5 @@
 from chromadb import PersistentClient
-
+import numpy as np
 from prompts.section_entity_matching_prompt import section_entity_matching_prompt
 
 from states.cluster_dev_state import ClusterDevState
