@@ -14,7 +14,7 @@ from chromadb import PersistentClient
 # Import functions
 from src.pdf_to_img import process_single_pdf
 from src.page_data_model_dev import convert_png_dir_to_proto_dm_async
-from src.emedding_dm import embed_data_models
+from src.emedding_dm import embed_data_models_async
 from src.section_to_entity_dev import build_cluster_dev_graph_workflow
 from states.cluster_dev_state import ClusterDevState
 
@@ -62,38 +62,39 @@ async def main():
     # print("\nStep 1 Completed.\n")
 
     ## 02. Data Model Generation
-    print("Step 2: Developing Proto Data Models (page level)...")
-    form_png_dir_paths = glob(os.path.join(forms_png_dir_path, "*"))
+    # print("Step 2: Developing Proto Data Models (page level)...")
+    # form_png_dir_paths = glob(os.path.join(forms_png_dir_path, "*"))
 
-    if not form_png_dir_paths:
-        print("No PNG directories found.")
-    else:
-        tasks = [
-            convert_png_dir_to_proto_dm_async(
-                form_png_dir_path,
-                os.path.join(forms_proto_dm_dir_path, os.path.basename(form_png_dir_path))
-            )
-            for form_png_dir_path in form_png_dir_paths
-        ]
+    # if not form_png_dir_paths:
+    #     print("No PNG directories found.")
+    # else:
+    #     tasks = [
+    #         convert_png_dir_to_proto_dm_async(
+    #             form_png_dir_path,
+    #             os.path.join(forms_proto_dm_dir_path, os.path.basename(form_png_dir_path))
+    #         )
+    #         for form_png_dir_path in form_png_dir_paths
+    #     ]
         
-        results = []
-        for coro in tqdm(asyncio.as_completed(tasks), total=len(tasks)):
-            form_pdf_name = await coro
-            print(f"✓ Proto Data Model Created: {form_pdf_name}")
-            results.append(form_pdf_name)
+    #     results = []
+    #     for coro in tqdm(asyncio.as_completed(tasks), total=len(tasks)):
+    #         form_pdf_name = await coro
+    #         print(f"✓ Proto Data Model Created: {form_pdf_name}")
+    #         results.append(form_pdf_name)
 
-    print("Step 2 Completed.\n")
+    # print("Step 2 Completed.\n")
 
     ## 03. Embed the data models
-    # print("Step 3: Embed the proto data models")
-    # form_proto_dm_dir_paths = glob(os.path.join(forms_proto_dm_dir_path, "*"))
-    # for form_proto_dm_dir_path in tqdm(form_proto_dm_dir_paths):
-    #     embed_data_models(form_proto_dm_dir_path)
-
-    #     form_pdf_name = os.path.basename(form_proto_dm_dir_path)
-    #     print(f"✓ Proto Data Model Embedded: {form_pdf_name}")
-
-    # print("Step 3 Completed.\n")
+    print("Step 3: Embed the proto data models")
+    form_proto_dm_dir_paths = glob(os.path.join(forms_proto_dm_dir_path, "*"))
+    
+    for form_proto_dm_dir_path in tqdm(form_proto_dm_dir_paths):
+        await embed_data_models_async(form_proto_dm_dir_path)
+        
+        form_pdf_name = os.path.basename(form_proto_dm_dir_path)
+        print(f"✓ Proto Data Model Embedded: {form_pdf_name}")
+    
+    print("Step 3 Completed.\n")
 
     ## 04. Knowledge graph entity development
     # print("Step 4: Develop Entities for KG using extracted sectional information")

@@ -35,7 +35,10 @@ async def process_single_png_async(form_png_path, form_proto_dm_dir_path):
     proto_dm_name = png_name[:-4] + ".proto"
     proto_dm_path = os.path.join(form_proto_dm_dir_path, proto_dm_name)
     
-    async with aiofiles.open(proto_dm_path, "w") as f:
-        await f.write(proto_dm_response)
+    try:
+        async with aiofiles.open(proto_dm_path, "w") as f:
+            await f.write(proto_dm_response)
+    except:
+        pass
         
 

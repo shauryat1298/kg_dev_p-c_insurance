@@ -93,6 +93,28 @@ def call_openrouter_embeddings(texts, model_name):
     # Returns list of embeddings (one per input text)
     return [e.embedding for e in response.data]
 
+async def call_openrouter_embeddings_async(texts, model_name, max_retries=3):
+    for attempt in range(max_retries):
+        try:
+            response = await async_client.embeddings.create(
+                model=model_name,
+                input=texts
+            )
+            # Returns list of embeddings (one per input text)
+            return [e.embedding for e in response.data]
+        except RateLimitError:
+            if attempt < max_retries - 1:
+                wait_time = 2 ** attempt
+                print(f"Rate limited. Waiting {wait_time}s before retry...")
+                await asyncio.sleep(wait_time)
+            else:
+                raise
+        except APIError as e:
+            print(f"API error on attempt {attempt + 1}: {e}")
+            if attempt == max_retries - 1:
+                raise
+            await asyncio.sleep(1)
+
 
 def generate_random_id(length: int = 8):
     return ''.join(random.choices(string.digits, k=length))
