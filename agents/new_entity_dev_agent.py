@@ -12,20 +12,10 @@ master_kg_entity_collection = client.get_or_create_collection(name=master_collec
 sectional_collection = client.get_or_create_collection(name=collection_name)
 
 
-def _get_master_collection():
-    """Fetch a fresh handle to the master KG collection to avoid stale UUIDs after deletion."""
-    return client.get_or_create_collection(name=master_collection_name)
-
 
 def new_entity_dev_agent(state: ClusterDevState):
-    master_collection = _get_master_collection()
 
-    # Refresh handle if the collection was dropped and recreated elsewhere.
-    try:
-        existing_entity_list = master_collection.get().get("ids", [])
-    except NotFoundError:
-        master_collection = _get_master_collection()
-        existing_entity_list = master_collection.get().get("ids", [])
+    existing_entity_list = master_kg_entity_collection.get().get("ids", [])
 
     messages = new_entity_dev_prompt(
         state["section"]["proto_heading"],
