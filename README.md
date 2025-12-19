@@ -17,6 +17,9 @@ The workflow is agent-based, using autonomous LLM agents coordinated through Lan
 - Modular structure supporting future parallelization and orchestration
 - Built with modern Python tooling (uv for dependency management)
 
+## Agentic Workflow for Entity Extraction
+![alt text](image.png)
+
 ## Tech Stack
 
 - **Python 3.12**
