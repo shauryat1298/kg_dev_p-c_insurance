@@ -4,7 +4,7 @@
 [![LangGraph](https://img.shields.io/badge/LangGraph-Agent%20Workflow-orange)](https://www.langchain.com/langgraph)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This repository contains an end-to-end pipeline for building a **Knowledge Graph (KG)** tailored to the **Property & Casualty (P&C) Insurance** domain. The project leverages Large Language Models (LLMs) via LangChain/LangGraph to extract entities, relationships, and structured data from insurance-related documents (e.g., policy documents, claims forms, underwriting guidelines) and construct a scalable knowledge graph stored in a vector database (ChromaDB).
+This repository contains an end-to-end pipeline for building a **Knowledge Graph (KG)** tailored to the **Property & Casualty (P&C) Insurance** domain. The project leverages Large Language Models (LLMs) via LangChain/LangGraph to extract entities, relationships, and structured data from insurance-related documents (e.g., policy documents, claims forms, underwriting guidelines) and construct a scalable knowledge graph for data extraction stored in a vector database (ChromaDB).
 
 The workflow is agent-based, using autonomous LLM agents coordinated through LangGraph state machines to process documents, generate data models, and populate the KG.
 
@@ -24,7 +24,6 @@ The workflow is agent-based, using autonomous LLM agents coordinated through Lan
 - **OpenAI** – LLM backend (configurable via environment variables)
 - **ChromaDB** – Vector store for the knowledge graph
 - **PyMuPDF** – PDF processing
-- **xai-sdk** – Integration with xAI models (optional/alternative backend)
 - Other utilities: asyncio, tqdm, scikit-learn, etc.
 
 ## Project Structure
@@ -60,20 +59,19 @@ kg_dev_p-c_insurance/
 
    Alternatively, with standard pip:
    ```bash
-   pip install -r requirements.txt
+   uv pip install -r requirements.txt
    ```
 
 3. Set up environment variables (create a `.env` file):
    ```env
    OPENAI_API_KEY=your_openai_key
-   # Optional: XAI_API_KEY=your_xai_key
    ```
 
 ## Usage
 
 Run the main pipeline:
 ```bash
-python main.py
+uv python run main.py
 ```
 
 The script will:
