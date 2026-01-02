@@ -7,14 +7,17 @@ def convert_pdf_to_png(pdf_path, output_folder):
     pdf_document = fitz.open(pdf_path)
 
     for page_number in range(len(pdf_document)):
-        page = pdf_document.load_page(page_number)
-        pixmap = page.get_pixmap(dpi=600)
+        try:
+            page = pdf_document.load_page(page_number)
+            pixmap = page.get_pixmap(dpi=600)
 
-        # Better way to format page numbers with leading zeros
-        prefixed_page_no = f"{page_number + 1:03d}"
+            prefixed_page_no = f"{page_number + 1:03d}"
 
-        output_file = f"{output_folder}/{file_name}_{prefixed_page_no}.png"
-        pixmap.save(output_file)
+            output_file = f"{output_folder}/{file_name}_{prefixed_page_no}.png"
+            pixmap.save(output_file)
+        except Exception as e:
+            print(f"Error converting page {page_number} to PNG: {e}")
+            continue
     
     pdf_document.close()
     return file_name

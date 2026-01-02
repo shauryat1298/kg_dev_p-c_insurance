@@ -1,7 +1,9 @@
 import os
 from pathlib import Path
 
-BASE_PATH = Path("C:/Users/shaur/Desktop/Learnings/lob_kg_dev")
+# Get project root directory (parent of config.py's parent directory)
+# Support BASE_PATH override via environment variable for flexibility
+BASE_PATH = Path(os.getenv("BASE_PATH", Path(__file__).parent))
 ARTIFACTS_PATH = os.path.join(BASE_PATH, "artifacts")
 
 forms_pdf_dir_path = os.path.join(ARTIFACTS_PATH, "forms_pdf") 

@@ -1,0 +1,55 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Artifacts (will be mounted as volume)
+artifacts/
+
+# Git
+.git/
+.gitignore
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment files (will be loaded separately)
+.env
+.env.local
+
+# Documentation
+*.md
+!README.md
+
+# Jupyter notebooks
+*.ipynb
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Lock files (dependencies installed from requirements.txt)
+uv.lock
+
+# Docker files themselves
+Dockerfile
+docker-compose.yml
+.dockerignore
+

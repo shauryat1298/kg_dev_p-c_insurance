@@ -11,3 +11,6 @@ scikit-learn
 langchain-core
 langchain-openai
 langgraph
+streamlit
+plotly
+networkx

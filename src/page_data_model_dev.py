@@ -20,7 +20,7 @@ async def convert_png_dir_to_proto_dm_async(form_png_dir_path, form_proto_dm_dir
     form_pdf_name = os.path.basename(form_png_dir_path)
     os.makedirs(form_proto_dm_dir_path, exist_ok=True)
 
-    form_png_paths = glob(os.path.join(form_png_dir_path, "*.png"), recursive=True)
+    form_png_paths = sorted(glob(os.path.join(form_png_dir_path, "*.png"), recursive=True))
     tasks = [process_single_png_async(form_png_path, form_proto_dm_dir_path) for form_png_path in form_png_paths]
     
     await asyncio.gather(*tasks)
@@ -29,7 +29,11 @@ async def convert_png_dir_to_proto_dm_async(form_png_dir_path, form_proto_dm_dir
 async def process_single_png_async(form_png_path, form_proto_dm_dir_path):
     messages = prompt_for_page_dm(form_png_path)
     
-    proto_dm_response = extract_proto_code_for_llm_response(await call_openrouter_llm_async(messages, COMPLEX_MODEL_NAME))
+    try:
+        proto_dm_response = extract_proto_code_for_llm_response(await call_openrouter_llm_async(messages, COMPLEX_MODEL_NAME))
+    except Exception as e:
+        print(f"Error processing single PNG: {e}")
+        return
 
     png_name = os.path.basename(form_png_path)
     proto_dm_name = png_name[:-4] + ".proto"

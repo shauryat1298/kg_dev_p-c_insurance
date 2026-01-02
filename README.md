@@ -37,10 +37,15 @@ kg_dev_p-c_insurance/
 ├── prompts/         # Prompt templates for entity/relationship extraction
 ├── src/             # Core source code and utilities
 ├── states/          # LangGraph state definitions and persistence
+├── frontend/        # Streamlit web interface
+├── artifacts/       # Generated data (PDFs, PNGs, proto files, ChromaDB)
 ├── config.py        # Configuration settings (API keys, paths, etc.)
 ├── main.py          # Entry point to run the full pipeline
 ├── requirements.txt # Python dependencies
 ├── pyproject.toml   # Project metadata
+├── Dockerfile       # Docker image configuration
+├── docker-compose.yml # Docker Compose configuration
+├── DEPLOYMENT.md    # Docker deployment guide
 ├── uv.lock          # Locked dependencies (managed by uv)
 ├── .gitignore
 └── .python-version
@@ -72,6 +77,8 @@ kg_dev_p-c_insurance/
 
 ## Usage
 
+### Local Development
+
 Run the main pipeline:
 ```bash
 uv python run main.py
@@ -84,6 +91,23 @@ The script will:
 - Build and persist the knowledge graph in ChromaDB
 
 You can customize document sources, prompts, or agent behavior by editing files in `config.py`, `prompts/`, and `agents/`.
+
+### Docker Deployment
+
+The application can be deployed using Docker for easier setup and consistent environments.
+
+**Quick Start:**
+```bash
+# Create .env file with your API keys
+echo "OPENAI_API_KEY=your_key_here" > .env
+
+# Build and start the container
+docker-compose up -d
+
+# Access the Streamlit app at http://localhost:8501
+```
+
+For detailed Docker deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## Development Roadmap
 
