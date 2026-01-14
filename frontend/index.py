@@ -17,6 +17,9 @@ from config import (
     BASE_PATH, ARTIFACTS_PATH, forms_pdf_dir_path, forms_png_dir_path, 
     forms_proto_dm_dir_path, chroma_db_client_path, master_collection_name, collection_name
 )
+from src.logging_config import get_logger
+
+logger = get_logger(__name__)
 
 # Page configuration
 st.set_page_config(
@@ -175,6 +178,7 @@ elif page == "📤 Upload Documents":
         st.write(f"**{len(uploaded_files)} file(s) selected**")
         
         if st.button("📥 Upload Files", type="primary"):
+            logger.info("file_upload_started", file_count=len(uploaded_files))
             os.makedirs(forms_pdf_dir_path, exist_ok=True)
             
             progress_bar = st.progress(0)
@@ -186,12 +190,17 @@ elif page == "📤 Upload Documents":
                 
                 # Save file
                 file_path = os.path.join(forms_pdf_dir_path, uploaded_file.name)
-                with open(file_path, "wb") as f:
-                    f.write(uploaded_file.getbuffer())
+                try:
+                    with open(file_path, "wb") as f:
+                        f.write(uploaded_file.getbuffer())
+                    logger.info("file_uploaded", file_name=uploaded_file.name, file_path=file_path)
+                    uploaded_count += 1
+                except Exception as e:
+                    logger.error("file_upload_error", file_name=uploaded_file.name, error=str(e), exc_info=True)
                 
-                uploaded_count += 1
                 progress_bar.progress((idx + 1) / len(uploaded_files))
             
+            logger.info("file_upload_completed", uploaded_count=uploaded_count, total_count=len(uploaded_files))
             status_text.text(f"✅ Successfully uploaded {uploaded_count} file(s)!")
             st.success(f"All files uploaded successfully!")
             st.balloons()
@@ -209,9 +218,12 @@ elif page == "📤 Upload Documents":
             with col2:
                 if st.button("🗑️ Delete", key=f"del_{os.path.basename(pdf_file)}"):
                     try:
+                        logger.info("file_deletion_started", file_path=pdf_file)
                         os.remove(pdf_file)
+                        logger.info("file_deleted", file_path=pdf_file)
                         st.rerun()
                     except Exception as e:
+                        logger.error("file_deletion_error", file_path=pdf_file, error=str(e), exc_info=True)
                         st.error(f"Error deleting file: {e}")
     else:
         st.info("No files uploaded yet.")
@@ -236,6 +248,7 @@ elif page == "⚙️ Process Pipeline":
         st.info(f"📄 Found {len(pdf_files)} PDF file(s) ready for processing.")
         
         if st.button("🚀 Start Processing", type="primary"):
+            logger.info("processing_pipeline_started", pdf_count=len(pdf_files))
             # Initialize session state for progress tracking
             if 'processing' not in st.session_state:
                 st.session_state.processing = False
@@ -380,9 +393,11 @@ elif page == "⚙️ Process Pipeline":
                 
                 st.markdown("---")
                 st.markdown('<div class="success-box"><h3>🎉 All Processing Steps Completed Successfully!</h3></div>', unsafe_allow_html=True)
+                logger.info("processing_pipeline_completed")
                 st.balloons()
                 
             except Exception as e:
+                logger.error("processing_pipeline_error", error=str(e), exc_info=True)
                 st.error(f"❌ Error during processing: {str(e)}")
                 st.exception(e)
             finally:

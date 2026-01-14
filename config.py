@@ -20,3 +20,8 @@ SIMPLE_MODEL_NAME = "openai/gpt-5-nano"
 OPENROUTER_EMBEDDING_MODEL_NAME = "sentence-transformers/all-minilm-l12-v2"
 extra_body = {}
 temperature = 0
+
+# Logging Configuration
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+LOG_DIR = os.path.join(BASE_PATH, "logs")
+LOG_FILE = "app.log"

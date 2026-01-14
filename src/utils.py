@@ -9,6 +9,9 @@ import asyncio
 from openai import OpenAI, AsyncOpenAI, APIError, RateLimitError
 from dotenv import load_dotenv
 from config import extra_body, temperature
+from src.logging_config import get_logger
+
+logger = get_logger(__name__)
 
 def encode_image(image_path):
   with open(image_path, "rb") as image_file:
@@ -39,18 +42,23 @@ def extract_proto_messages(proto_content):
     return messages
 
 def call_openrouter_llm(messages, model_name):
-    client = OpenAI(
-        base_url="https://openrouter.ai/api/v1",
-        api_key=os.getenv("OPENROUTER_API_KEY"),
-    )
-    response = client.chat.completions.create(
-        model = model_name,
-        messages = messages,
-        temperature = temperature,
-        extra_body=extra_body
-    )
-
-    return response.choices[0].message.content
+    logger.debug("llm_api_call", model=model_name)
+    try:
+        client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=os.getenv("OPENROUTER_API_KEY"),
+        )
+        response = client.chat.completions.create(
+            model = model_name,
+            messages = messages,
+            temperature = temperature,
+            extra_body=extra_body
+        )
+        logger.debug("llm_api_success", model=model_name)
+        return response.choices[0].message.content
+    except Exception as e:
+        logger.error("llm_api_error", model=model_name, error=str(e), exc_info=True)
+        raise
 
 load_dotenv()
 async_client = AsyncOpenAI(
@@ -61,56 +69,68 @@ async_client = AsyncOpenAI(
 async def call_openrouter_llm_async(messages, model_name, max_retries=3):
     for attempt in range(max_retries):
         try:
+            logger.debug("llm_api_call", model=model_name, attempt=attempt + 1)
             response = await async_client.chat.completions.create(
                 model=model_name,
                 messages=messages,
                 temperature=temperature,
                 extra_body=extra_body
             )
+            logger.debug("llm_api_success", model=model_name, attempt=attempt + 1)
             return response.choices[0].message.content
         except RateLimitError:
             if attempt < max_retries - 1:
                 wait_time = 2 ** attempt 
-                print(f"Rate limited. Waiting {wait_time}s before retry...")
+                logger.warning("rate_limit_retry", model=model_name, attempt=attempt + 1, wait_time=wait_time)
                 await asyncio.sleep(wait_time)
             else:
+                logger.error("rate_limit_exceeded", model=model_name, max_retries=max_retries)
                 raise
         except APIError as e:
-            print(f"API error on attempt {attempt + 1}: {e}")
+            logger.error("llm_api_error", model=model_name, attempt=attempt + 1, error=str(e), exc_info=True)
             if attempt == max_retries - 1:
                 raise
             await asyncio.sleep(1)
 
 def call_openrouter_embeddings(texts, model_name):
-    client = OpenAI(
-        base_url="https://openrouter.ai/api/v1",
-        api_key=os.getenv("OPENROUTER_API_KEY"),
-    )
-    response = client.embeddings.create(
-        model=model_name,
-        input=texts
-    )
-    # Returns list of embeddings (one per input text)
-    return [e.embedding for e in response.data]
+    logger.debug("embeddings_api_call", model=model_name, text_count=len(texts))
+    try:
+        client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=os.getenv("OPENROUTER_API_KEY"),
+        )
+        response = client.embeddings.create(
+            model=model_name,
+            input=texts
+        )
+        # Returns list of embeddings (one per input text)
+        logger.debug("embeddings_api_success", model=model_name, count=len(response.data))
+        return [e.embedding for e in response.data]
+    except Exception as e:
+        logger.error("embeddings_api_error", model=model_name, error=str(e), exc_info=True)
+        raise
 
 async def call_openrouter_embeddings_async(texts, model_name, max_retries=3):
     for attempt in range(max_retries):
         try:
+            logger.debug("embeddings_api_call", model=model_name, text_count=len(texts), attempt=attempt + 1)
             response = await async_client.embeddings.create(
                 model=model_name,
                 input=texts
             )
             # Returns list of embeddings (one per input text)
+            logger.debug("embeddings_api_success", model=model_name, count=len(response.data), attempt=attempt + 1)
             return [e.embedding for e in response.data]
         except RateLimitError:
             if attempt < max_retries - 1:
                 wait_time = 2 ** attempt
-                print(f"Rate limited. Waiting {wait_time}s before retry...")
+                logger.warning("rate_limit_retry", model=model_name, attempt=attempt + 1, wait_time=wait_time)
                 await asyncio.sleep(wait_time)
             else:
+                logger.error("rate_limit_exceeded", model=model_name, max_retries=max_retries)
                 raise
         except APIError as e:
-            print(f"API error on attempt {attempt + 1}: {e}")
+            logger.error("embeddings_api_error", model=model_name, attempt=attempt + 1, error=str(e), exc_info=True)
             if attempt == max_retries - 1:
                 raise
             await asyncio.sleep(1)

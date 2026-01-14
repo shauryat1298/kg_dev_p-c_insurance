@@ -13,4 +13,7 @@ wheels/
 # Artifacts
 artifacts
 
+# Logs
+logs/
+
 main_workflow.ipynb
