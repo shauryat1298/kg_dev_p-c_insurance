@@ -22,7 +22,7 @@ This guide explains how to deploy the Insurance Data Model Builder application u
    ```
 
 3. **Access the application**:
-   Open your browser and navigate to `http://localhost:8501`
+   Open your browser and navigate to `http://localhost:7680`
 
 4. **View logs**:
    ```bash
